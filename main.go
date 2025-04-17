@@ -82,37 +82,56 @@ func postTrades(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, newTrade)
 }
 
-func patchTradesById(c *gin.Context) {
-	id, err := strconv.Atoi(c.Query("id"))
+type tradeUpdate struct {
+	Country        *string `json:"Country"`
+	Year           *int    `json:"Year"`
+	Commodity_code *string `json:"Commodity_code"`
+	Commodity_desc *string `json:"Commodity_desc"`
+	Flow           *string `json:"Flow"`
+	Trade_usd      *int    `json:"Trade_usd"`
+}
 
+func updateTradeById(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "invalid trade id"})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "invalid trade ID"})
 		return
 	}
 
-	yearParam := c.Query("year")
-	countryParam := c.Query("country")
-	commodityParam := c.Query("commodity_code")
-	flowParam := c.Query("flow")
+	var update tradeUpdate
+	if err := c.BindJSON(&update); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "invalid JSON body"})
+		return
+	}
 
-	var params = []string{yearParam, countryParam, commodityParam, flowParam}
-
-	//var filteredTrades []trade
-
-	for _, t := range trades {
+	for i, t := range trades {
 		if t.ID == id {
-			for _, p := range params {
-
+			if update.Country != nil {
+				trades[i].Country = *update.Country
+			}
+			if update.Year != nil {
+				trades[i].Year = *update.Year
+			}
+			if update.Commodity_code != nil {
+				trades[i].Commodity_code = *update.Commodity_code
+			}
+			if update.Commodity_desc != nil {
+				trades[i].Commodity_desc = *update.Commodity_desc
+			}
+			if update.Flow != nil {
+				trades[i].Flow = *update.Flow
+			}
+			if update.Trade_usd != nil {
+				trades[i].Trade_usd = *update.Trade_usd
 			}
 
+			c.IndentedJSON(http.StatusOK, trades[i])
+			return
 		}
-
-		year, err := strconv.Atoi(yearParam)
-		if err != nil || t.Year != year {
-			match = false
-		}
-
 	}
+
+	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "trade not found"})
 }
 
 // getTradeByCountry
@@ -124,7 +143,7 @@ func main() {
 	router.GET("/trades", getTrades)
 	router.GET("/trades/filter", getFilteredTrades)
 	router.POST("/trades", postTrades)
-	router.PATCH("trades", patchTradesById)
+	router.PATCH("trades/:id", updateTradeById)
 
 	router.Run("localhost:8080")
 }

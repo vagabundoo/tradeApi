@@ -11,6 +11,9 @@ curl http://localhost:8080/trades \
     --request "POST" \
     --data '{"ID": 4, "Country": "United States","Year": 2007,"Commodity_code": "010410","Commodity_desc": "Sheep, live","Flow": "Export","Trade_usd": 219992664}'
 
+curl -X PATCH http://localhost:8080/trades/3 \
+  -H "Content-Type: application/json" \
+  -d '{"Year": 2000, "Flow": "Import"}'
 
 
 
