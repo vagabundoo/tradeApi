@@ -27,15 +27,15 @@ async def get_trades(skip: int = 0, limit: int = 100):
 
 @app.get("/trades/filter")
 async def filter_trades(
-    id: int | None = None,
-    country: str | None = None,
-    year: int | None = None,
-    commodity_code: str | None = None,
-    flow: str | None = None
+    id: int = None,
+    country: str = None,
+    year: int = None,
+    commodity_code: str = None,
+    flow: str = None
 ):
     filtered_trades = []
 
-    for i in trades:
+    for i in range(len(trades)):
         # we iterate through records, and continue early if one of the filter criteria is not met
         if id: 
             if id != trades[i].id: continue
@@ -49,10 +49,8 @@ async def filter_trades(
             if flow != trades[i].flow: continue
 
         filtered_trades.append(trades[i])
-
-        
-
-    return {"message": "Hello World"}
+     
+    return filtered_trades
 
 @app.post("/trades")
 async def root():
