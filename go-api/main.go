@@ -134,11 +134,7 @@ func updateTradeById(c *gin.Context) {
 	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "trade not found"})
 }
 
-// getTradeByCountry
-
 func main() {
-	//fmt.Println(trades)
-
 	router := gin.Default()
 	router.GET("/trades", getTrades)
 	router.GET("/trades/filter", getFilteredTrades)
