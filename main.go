@@ -29,11 +29,26 @@ func getTrades(c *gin.Context){
 	c.IndentedJSON(http.StatusOK, trades)
 }
 
+func postTrades(c *gin.Context){
+	var newTrade trade
+
+	// Call BindJSON to bind the received JSON to
+    // newTrade.
+	if err := c.BindJSON(&newTrade); err != nil {
+		return
+	}
+
+	// Add the new trade to the slice.
+   	trades = append(trades, newTrade)
+    c.IndentedJSON(http.StatusCreated, newTrade)
+}
+
 func main() {
 	//fmt.Println(trades)
 
 	router := gin.Default()
 	router.GET("/trades", getTrades)
+	router.POST("/trades", postTrades)
 
 	router.Run("localhost:8080")
 }
