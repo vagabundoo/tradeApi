@@ -6,6 +6,6 @@ curl http://localhost:8080/trades \
 
 #curl http://localhost:8080/trades
 
-curl http://localhost:8080/trades/year=?2007
+curl http://localhost:8080/trades/2007
 
     

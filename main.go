@@ -75,7 +75,7 @@ func main() {
 
 	router := gin.Default()
 	router.GET("/trades", getTrades)
-	router.GET("/trades/year=:year", getTradesByYear)
+	router.GET("/trades/year/:year", getTradesByYear)
 	router.POST("/trades", postTrades)
 
 	router.Run("localhost:8080")
