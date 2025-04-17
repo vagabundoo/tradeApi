@@ -73,5 +73,6 @@ async def patch_trade_by_id(
             if year: trades[i].year = year
             if commodity_code: trades[i].commodity_code = commodity_code
             if flow: trades[i].flow = flow
+            return trades[i]
 
-    return trades[i]
+    
