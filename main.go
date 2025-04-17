@@ -1,18 +1,39 @@
 package main
 
-//country_or_area,year,comm_code,commodity,flow,trade_usd,
+//Country_or_area,Year,comm_code,commodity,Flow,Trade_usd,
 
-type tradeRecord struct {
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+	//"fmt"
+)
+
+type trade struct {
 	ID		int64 `json:"id"`
-	country string `json:"country"`
-	year	string `json:"year"`
-	commodity_code string `json:"commodity_code"`
-	commodity_desc string `json:"commodity_desc"`
-	flow string `json:"flow"`
-	trade_usd int64 `json:"trade_usd"`
+	Country string `json:"Country"`
+	Year	int64 `json:"Year"`
+	Commodity_code string `json:"Commodity_code"`
+	Commodity_desc string `json:"Commodity_desc"`
+	Flow string `json:"Flow"`
+	Trade_usd int64 `json:"Trade_usd"`
 }
 
-var 
-1, Afghanistan,2016,010410,"Sheep, live",Export,6088
-2, Argentina,1996,010410,"Sheep, live",Import,798372
-3, Australia,2007,010410,"Sheep, live",Export,219992664
+var trades = []trade{
+	{ID: 1, Country: "Afghanistan",Year: 2016,Commodity_code: "010410", Commodity_desc: "Sheep, live",Flow: "Export",Trade_usd: 6088},
+	{ID: 2, Country: "Argentina",Year: 1996,Commodity_code: "010410", Commodity_desc: "Sheep, live",Flow: "Import",Trade_usd: 798372},
+	{ID: 3, Country: "Australia",Year: 2007,Commodity_code: "010410",Commodity_desc: "Sheep, live",Flow: "Export",Trade_usd: 219992664},
+}
+
+func getTrades(c *gin.Context){
+	c.IndentedJSON(http.StatusOK, trades)
+}
+
+func main() {
+	//fmt.Println(trades)
+
+	router := gin.Default()
+	router.GET("/trades", getTrades)
+
+	router.Run("localhost:8080")
+}
