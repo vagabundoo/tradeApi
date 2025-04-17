@@ -3,7 +3,6 @@ package main
 //Country_or_area,Year,comm_code,commodity,Flow,Trade_usd,
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -31,27 +30,42 @@ func getTrades(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, trades)
 }
 
-func getTradesByYear(c *gin.Context) {
-	// conversion is required from string in JSON to int
-	year, err := strconv.Atoi(c.Param("year"))
+func getFilteredTrades(c *gin.Context) {
+	yearParam := c.Query("year")
+	countryParam := c.Query("country")
+	commodityParam := c.Query("commodity_code")
 
-	if err != nil {
-		fmt.Println(err)
-	}
+	var filteredTrades []trade
 
-	var matchingTrades = []trade{}
+	for _, t := range trades {
+		match := true
 
-	// Loop over list of trades, looking for
-	// a trade whose Year matches the parameter.
-	for _, a := range trades {
-		if a.Year == year {
-			matchingTrades = append(matchingTrades, a)
+		if yearParam != "" {
+			year, err := strconv.Atoi(yearParam)
+			if err != nil || t.Year != year {
+				match = false
+			}
 		}
+
+		if countryParam != "" && t.Country != countryParam {
+			match = false
+		}
+
+		if commodityParam != "" && t.Commodity_code != commodityParam {
+			match = false
+		}
+
+		if match {
+			filteredTrades = append(filteredTrades, t)
+		}
+
 	}
 
-	// return all matching trades
-	c.IndentedJSON(http.StatusOK, matchingTrades)
-
+	if len(filteredTrades) == 0 {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "no matching trades found"})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, filteredTrades)
 }
 
 func postTrades(c *gin.Context) {
@@ -68,6 +82,39 @@ func postTrades(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, newTrade)
 }
 
+func patchTradesById(c *gin.Context) {
+	id, err := strconv.Atoi(c.Query("id"))
+
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "invalid trade id"})
+		return
+	}
+
+	yearParam := c.Query("year")
+	countryParam := c.Query("country")
+	commodityParam := c.Query("commodity_code")
+	flowParam := c.Query("flow")
+
+	var params = []string{yearParam, countryParam, commodityParam, flowParam}
+
+	//var filteredTrades []trade
+
+	for _, t := range trades {
+		if t.ID == id {
+			for _, p := range params {
+
+			}
+
+		}
+
+		year, err := strconv.Atoi(yearParam)
+		if err != nil || t.Year != year {
+			match = false
+		}
+
+	}
+}
+
 // getTradeByCountry
 
 func main() {
@@ -75,8 +122,9 @@ func main() {
 
 	router := gin.Default()
 	router.GET("/trades", getTrades)
-	router.GET("/trades/year/:year", getTradesByYear)
+	router.GET("/trades/filter", getFilteredTrades)
 	router.POST("/trades", postTrades)
+	router.PATCH("trades", patchTradesById)
 
 	router.Run("localhost:8080")
 }
